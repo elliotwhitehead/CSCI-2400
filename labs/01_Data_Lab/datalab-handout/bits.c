@@ -260,7 +260,9 @@ int divpwr2(int x, int n) {
  *   Rating: 2
  */
 int negate(int x) {
-  return 2;
+    // Baisc two's complement - negate all the bits, and add 1.
+    // i.e. 1111(-1) becomes 0001
+    return ~x + 1;
 }
 /* 
  * isPositive - return 1 if x > 0, return 0 otherwise 
