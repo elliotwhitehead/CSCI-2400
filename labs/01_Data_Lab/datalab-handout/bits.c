@@ -227,7 +227,8 @@ int bang(int x) {
  *   Rating: 1
  */
 int tmin(void) {
-  return 2;
+    // The smallest possible signed number would be 0x80000000
+    return 1 << 31;
 }
 /* 
  * fitsBits - return 1 if x can be represented as an 
