@@ -184,7 +184,10 @@ int bitAnd(int x, int y) {
  *   Rating: 2
  */
 int getByte(int x, int n) {
-  return 2;
+    // Multiply n by 8 to get the proper bit position (left shift by 3)
+    // Then, shift x over by n*3 bits, and mask the result by 0xff to get
+    // final result.
+    return (x >> (n << 3)) & 0xff;
 }
 /* 
  * logicalShift - shift x to the right by n, using a logical shift
