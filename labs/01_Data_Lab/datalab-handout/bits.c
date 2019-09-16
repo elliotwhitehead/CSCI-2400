@@ -172,7 +172,8 @@ NOTES:
  *   Rating: 1
  */
 int bitAnd(int x, int y) {
-  return 2;
+    // Use DeMorgan's Law to build OR function
+    return ~(~x | ~y);
 }
 /* 
  * getByte - Extract byte n from word x
