@@ -272,7 +272,9 @@ int negate(int x) {
  *   Rating: 3
  */
 int isPositive(int x) {
-  return 2;
+    //shift x over 31 bits to get the sign bit, then bang it get the opposite.
+    // & this with !!x to ensure x is not zero. 
+    return !(x >> 31) & (!!x);
 }
 /* 
  * isLessOrEqual - if x <= y  then return 1, else return 0 
