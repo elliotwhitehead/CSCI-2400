@@ -172,7 +172,8 @@ NOTES:
  *   Rating: 1
  */
 int bitAnd(int x, int y) {
-  return 2;
+    // Use DeMorgan's Law to build OR function
+    return ~(~x | ~y);
 }
 /* 
  * getByte - Extract byte n from word x
@@ -183,7 +184,10 @@ int bitAnd(int x, int y) {
  *   Rating: 2
  */
 int getByte(int x, int n) {
-  return 2;
+    // Multiply n by 8 to get the proper bit position (left shift by 3)
+    // Then, shift x over by n*3 bits, and mask the result by 0xff to get
+    // final result.
+    return (x >> (n << 3)) & 0xff;
 }
 /* 
  * logicalShift - shift x to the right by n, using a logical shift
@@ -223,7 +227,8 @@ int bang(int x) {
  *   Rating: 1
  */
 int tmin(void) {
-  return 2;
+    // The smallest possible signed number would be 0x80000000
+    return 1 << 31;
 }
 /* 
  * fitsBits - return 1 if x can be represented as an 
@@ -256,7 +261,9 @@ int divpwr2(int x, int n) {
  *   Rating: 2
  */
 int negate(int x) {
-  return 2;
+    // Baisc two's complement - negate all the bits, and add 1.
+    // i.e. 1111(-1) becomes 0001
+    return ~x + 1;
 }
 /* 
  * isPositive - return 1 if x > 0, return 0 otherwise 
@@ -266,7 +273,9 @@ int negate(int x) {
  *   Rating: 3
  */
 int isPositive(int x) {
-  return 2;
+    //shift x over 31 bits to get the sign bit, then bang it get the opposite.
+    // & this with !!x to ensure x is not zero. 
+    return !(x >> 31) & (!!x);
 }
 /* 
  * isLessOrEqual - if x <= y  then return 1, else return 0 
