@@ -208,6 +208,7 @@ int logicalShift(int x, int n) {
  *   Rating: 4
  */
 int bitCount(int x) {
+    
   return 2;
 }
 /* 
@@ -240,7 +241,7 @@ int tmin(void) {
  *   Rating: 2
  */
 int fitsBits(int x, int n) {
-  return 2;
+    return 2;
 }
 /* 
  * divpwr2 - Compute x/(2^n), for 0 <= n <= 30
@@ -251,6 +252,8 @@ int fitsBits(int x, int n) {
  *   Rating: 2
  */
 int divpwr2(int x, int n) {
+    // becuase of two's complement, we need to be sure to handle rounding bias
+    // 
     return 2;
 }
 /* 
