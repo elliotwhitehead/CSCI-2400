@@ -1,2 +1,2 @@
 break explode_bomb
-break phase_4
+break phase_6
