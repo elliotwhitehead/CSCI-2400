@@ -95,42 +95,107 @@ double
 applyFilter(struct Filter *filter, cs1300bmp *input, cs1300bmp *output)
 {
 
-  long long cycStart, cycStop;
+    long long cycStart, cycStop;
 
-  cycStart = rdtscll();
+    cycStart = rdtscll();
 
-  output -> width = input -> width;
-  output -> height = input -> height;
+    output -> width = input -> width;
+    output -> height = input -> height;
+    
+    //Get row /col length computation out of for loops
+    int row_length = (input -> height) - 1;
+    int col_length = (input -> width) - 1;
+    
+    //get divisor access out of loops
+    int filter_divisor = filter -> getDivisor();
+    
+    //get filter data access out of loops
+    //int local_filter_data [9];
+    //for(int z = 0; z < 9; z++){
+    //   local_filter_data[z] = filter -> data[z];
+    //}
+    
+    //Address filter data by memory address
+    int *filter_data_ptr = &(filter -> data[0]);
 
+    int plane;
+    int row;
+    int col;
+    
+    //Variables for storing data array offsets
+    int *matrix_ptr = &(input -> color[0][0][0]);
+    int plane_offset = 0;
+    int row_offset = 0;
+    int col_offset;
+    
+    
+    
+    for(plane = 0; plane < 3; ++plane) {
+        plane_offset = plane * 67108864; // 67108864 8191^2 
+            
+        for(row = 1; row < row_length; ++row) {
+            row_offset = plane_offset + (row * 8192);
+            
+            for(col = 1; col < col_length; ++col) {
+                col_offset = row_offset + col;
+                
+                /*
+                int i = 0;
+                for (; i < filter_size; i++) {
+                    int j = 0;
+                    for (; j < filter_size; j++) {
+                        output -> color[plane][row][col] += (input -> color[plane][row + i - 1][col + j - 1] * filter -> data[ i * 3 + j ] );
+                    }
+                }
+                */
+                
+                int output_acc1 = 0;
+                int output_acc2 = 0;
+                int output_acc3 = 0;
+                
+//                 output_acc1 += input -> color [plane] [row - 1] [col - 1] * *(filter_data_ptr);                
+//                 output_acc2 += input -> color [plane] [row - 1] [col]     * *(filter_data_ptr + 1);
+//                 output_acc3 += input -> color [plane] [row - 1] [col + 1] * *(filter_data_ptr + 2);
+//                 output_acc1 += input -> color [plane] [row]     [col - 1] * *(filter_data_ptr + 3);
+//                 output_acc2 += input -> color [plane] [row]     [col]     * *(filter_data_ptr + 4);
+//                 output_acc3 += input -> color [plane] [row]     [col + 1] * *(filter_data_ptr + 5);
+//                 output_acc1 += input -> color [plane] [row + 1] [col - 1] * *(filter_data_ptr + 6);
+//                 output_acc2 += input -> color [plane] [row + 1] [col]     * *(filter_data_ptr + 7);
+//                 output_acc3 += input -> color [plane] [row + 1] [col + 1] * *(filter_data_ptr + 8);
 
-  for(int col = 1; col < (input -> width) - 1; col = col + 1) {
-    for(int row = 1; row < (input -> height) - 1 ; row = row + 1) {
-      for(int plane = 0; plane < 3; plane++) {
+                
+                
+                
+                output_acc1 += *( matrix_ptr + (col_offset - 8193) )  * *(filter_data_ptr);
+                output_acc2 += *( matrix_ptr + (col_offset - 8192) )  * *(filter_data_ptr + 1);
+                output_acc3 += *( matrix_ptr + (col_offset - 8191) )  * *(filter_data_ptr + 2);
+                output_acc1 += *( matrix_ptr + col_offset - 1 )       * *(filter_data_ptr + 3);
+                output_acc2 += *( matrix_ptr + col_offset )           * *(filter_data_ptr + 4);
+                output_acc3 += *( matrix_ptr + col_offset +1 )        * *(filter_data_ptr + 5);
+                output_acc1 += *( matrix_ptr + col_offset + 8191 )    * *(filter_data_ptr + 6);
+                output_acc2 += *( matrix_ptr + col_offset + 8192 )    * *(filter_data_ptr + 7);
+                output_acc3 += *( matrix_ptr + col_offset + 8193 )    * *(filter_data_ptr + 8);
+                
+                int total = ( output_acc1 + output_acc2 + output_acc3 );
+                
+                if ( filter_divisor != 1 ){
+                     total /= filter_divisor;
+                }
 
-        output -> color[plane][row][col] = 0;
-
-        for (int j = 0; j < filter -> getSize(); j++) {
-          for (int i = 0; i < filter -> getSize(); i++) {	
-            output -> color[plane][row][col]
-              = output -> color[plane][row][col]
-              + (input -> color[plane][row + i - 1][col + j - 1] 
-             * filter -> get(i, j) );
-          }
+                /*if ( total  < 0 ) {
+                    total = 0;
+                }
+                else if ( total  > 255 ) {
+                    total = 255;
+                }*/
+                
+                total = total < 0 ? 0 : total > 255 ? 255 : total;
+                
+                output -> color[plane][row][col] = total;
+                
+            }
         }
-
-        output -> color[plane][row][col] = 	
-          output -> color[plane][row][col] / filter -> getDivisor();
-
-        if ( output -> color[plane][row][col]  < 0 ) {
-          output -> color[plane][row][col] = 0;
-        }
-
-        if ( output -> color[plane][row][col]  > 255 ) { 
-          output -> color[plane][row][col] = 255;
-        }
-      }
     }
-  }
 
   cycStop = rdtscll();
   double diff = cycStop - cycStart;
