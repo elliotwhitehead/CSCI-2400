@@ -4,6 +4,7 @@
 #include <fstream>
 #include "Filter.h"
 
+
 using namespace std;
 
 #include "rdtsc.h"
@@ -129,7 +130,7 @@ applyFilter(struct Filter *filter, cs1300bmp *input, cs1300bmp *output)
     int col_offset;
     
     
-    
+
     for(plane = 0; plane < 3; ++plane) {
         plane_offset = plane * 67108864; // 67108864 8191^2 
             
