@@ -3,3 +3,7 @@ core.bomb.*
 .ipynb_checkpoints
 btest
 *.o
+myint
+myspin
+mysplit
+mystop
