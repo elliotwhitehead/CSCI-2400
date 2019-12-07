@@ -155,16 +155,19 @@ void eval(char *cmdline)
   // for the execve() routine, which you'll need to
   // use below to launch a process.
   //
-  char *argv[MAXARGS];
+    char *argv[MAXARGS];
 
   //
   // The 'bg' variable is TRUE if the job should run
   // in background mode or FALSE if it should run in FG
   //
-  int bg = parseline(cmdline, argv); 
-  if (argv[0] == NULL)  
-    return;   /* ignore empty lines */
-
+    int bg = parseline(cmdline, argv); 
+    if (argv[0] == NULL) return;   /* ignore empty lines */
+    
+    if(!builtin_cmd(argv)){
+        printf("forking");
+    }
+    
   return;
 }
 
@@ -179,8 +182,19 @@ void eval(char *cmdline)
 //
 int builtin_cmd(char **argv) 
 {
-  string cmd(argv[0]);
-  return 0;     /* not a builtin command */
+    string cmd(argv[0]);
+    if(cmd == "quit"){
+        exit(0);
+    } else if(cmd == "fg"){
+        //handle fg command
+        return 1;
+    } else if (cmd == "bg"){
+        return 1;
+    } else if (cmd == "jobs"){
+        return 1;
+    }
+    
+    return 0;     /* not a builtin command */
 }
 
 /////////////////////////////////////////////////////////////////////////////
