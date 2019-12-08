@@ -177,7 +177,8 @@ void eval(char *cmdline)
         }
         addjob(jobs, pid, bg ? BG : FG, cmdline);
         if(!bg){
-            wait(NULL);
+            waitfg(pid);
+            //wait(NULL);
         }else{
             // Print confirmation of launched backgrounded job
             job = getjobpid(jobs, pid);
@@ -220,46 +221,46 @@ int builtin_cmd(char **argv)
 //
 void do_bgfg(char **argv) 
 {
-  struct job_t *jobp=NULL;
+    struct job_t *jobp=NULL;
     
-  /* Ignore command if no argument */
-  if (argv[1] == NULL) {
-    printf("%s command requires PID or %%jobid argument\n", argv[0]);
-    return;
-  }
+    /* Ignore command if no argument */
+    if (argv[1] == NULL) {
+        printf("%s command requires PID or %%jobid argument\n", argv[0]);
+        return;
+    }
     
-  /* Parse the required PID or %JID arg */
-  if (isdigit(argv[1][0])) {
-    pid_t pid = atoi(argv[1]);
-    if (!(jobp = getjobpid(jobs, pid))) {
-      printf("(%d): No such process\n", pid);
-      return;
+    /* Parse the required PID or %JID arg */
+    if (isdigit(argv[1][0])) {
+        pid_t pid = atoi(argv[1]);
+        if (!(jobp = getjobpid(jobs, pid))) {
+            printf("(%d): No such process\n", pid);
+            return;
+        }
     }
-  }
-  else if (argv[1][0] == '%') {
-    int jid = atoi(&argv[1][1]);
-    if (!(jobp = getjobjid(jobs, jid))) {
-      printf("%s: No such job\n", argv[1]);
-      return;
+    else if (argv[1][0] == '%') {
+        int jid = atoi(&argv[1][1]);
+        if (!(jobp = getjobjid(jobs, jid))) {
+            printf("%s: No such job\n", argv[1]);
+            return;
+        }
     }
-  }	    
-  else {
-    printf("%s: argument must be a PID or %%jobid\n", argv[0]);
+    else {
+        printf("%s: argument must be a PID or %%jobid\n", argv[0]);
+        return;
+    }
+
+    //
+    // You need to complete rest. At this point,
+    // the variable 'jobp' is the job pointer
+    // for the job ID specified as an argument.
+    //
+    // Your actions will depend on the specified command
+    // so we've converted argv[0] to a string (cmd) for
+    // your benefit.
+    //
+    string cmd(argv[0]);
+
     return;
-  }
-
-  //
-  // You need to complete rest. At this point,
-  // the variable 'jobp' is the job pointer
-  // for the job ID specified as an argument.
-  //
-  // Your actions will depend on the specified command
-  // so we've converted argv[0] to a string (cmd) for
-  // your benefit.
-  //
-  string cmd(argv[0]);
-
-  return;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -268,7 +269,11 @@ void do_bgfg(char **argv)
 //
 void waitfg(pid_t pid)
 {
-  return;
+    struct job_t *job = getjobpid(jobs, pid);
+    while(job->state == 1){
+        sleep(1);
+    }
+    return;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -287,7 +292,12 @@ void waitfg(pid_t pid)
 //
 void sigchld_handler(int sig) 
 {
-  return;
+    pid_t pid;
+    int status;
+    while((pid = waitpid(-1, &status, WNOHANG)) > 0){
+        deletejob(jobs, pid);
+    }
+    return;
 }
 
 /////////////////////////////////////////////////////////////////////////////
