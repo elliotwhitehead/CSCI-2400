@@ -160,15 +160,32 @@ void eval(char *cmdline)
   //
   // The 'bg' variable is TRUE if the job should run
   // in background mode or FALSE if it should run in FG
-  //
+    
+    // Track process id and make new job
+    pid_t pid;
+    struct job_t *job;
+    
     int bg = parseline(cmdline, argv); 
     if (argv[0] == NULL) return;   /* ignore empty lines */
     
     if(!builtin_cmd(argv)){
-        printf("forking");
+        if((pid = fork()) == 0){
+            // In child
+            execvp(argv[0], argv);
+            printf("%s: Command not found\n", argv[0]);
+            exit(0);
+        }
+        addjob(jobs, pid, bg ? BG : FG, cmdline);
+        if(!bg){
+            wait(NULL);
+        }else{
+            // Print confirmation of launched backgrounded job
+            job = getjobpid(jobs, pid);
+            printf("[%d] (%d) %s", job->jid, job->pid, cmdline);
+        }
     }
     
-  return;
+    return;
 }
 
 
