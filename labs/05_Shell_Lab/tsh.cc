@@ -209,6 +209,7 @@ int builtin_cmd(char **argv)
     } else if (cmd == "bg"){
         return 1;
     } else if (cmd == "jobs"){
+        listjobs(jobs);
         return 1;
     }
     
