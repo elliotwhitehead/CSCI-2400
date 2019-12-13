@@ -33,7 +33,7 @@ int verbose = 0;
     
     [x] eval
     [x] builtin_cmd
-    [ ] do_bgfg
+    [x] do_bgfg
     [x] waitfg
     [x] sigchld_handler
     [x] sigstp_handler
